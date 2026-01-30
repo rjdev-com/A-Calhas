@@ -33,11 +33,25 @@ export default function Contato() {
     setError('');
 
     try {
+      // Salvar no Supabase
       const { error: submitError } = await supabase
         .from('contact_submissions')
         .insert([formData]);
 
       if (submitError) throw submitError;
+
+      // Enviar email via API
+      const emailResponse = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!emailResponse.ok) {
+        console.error('Erro ao enviar email, mas dados foram salvos');
+      }
 
       setSuccess(true);
       setFormData({
