@@ -1,7 +1,6 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-import nodemailer from 'nodemailer';
+const nodemailer = require('nodemailer');
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+module.exports = async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -18,7 +17,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT) || 465,
-    secure: Number(process.env.SMTP_PORT) === 465, // true for 465, false for other ports
+    secure: Number(process.env.SMTP_PORT) === 465,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
@@ -112,4 +111,4 @@ Este email foi enviado automaticamente pelo formulário de contato do site A Cal
     console.error('Erro ao enviar email:', error);
     return res.status(500).json({ error: 'Erro ao enviar email. Tente novamente.' });
   }
-}
+};
