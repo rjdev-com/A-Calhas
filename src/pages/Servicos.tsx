@@ -3,6 +3,11 @@ import { usePageContent } from '../hooks/usePageContent';
 
 export default function Servicos() {
   const { getContent } = usePageContent('servicos');
+  const { get: getGeral } = usePageContent('inicio');
+  
+  // WhatsApp configuravel
+  const whatsappNumero = getGeral('whatsapp_numero', '5547989100709');
+  const whatsappLink = `https://wa.me/${whatsappNumero}?text=${encodeURIComponent('Ola, gostaria de um orcamento para o servico de ')}`;
 
   const services = [
     {
@@ -194,12 +199,12 @@ export default function Servicos() {
                   </ul>
 
                   <a
-                    href="https://wa.me/5547989100709?text=Olá,%20gostaria%20de%20um%20orçamento%20para%20o%20serviço%20de%20"
+                    href={whatsappLink}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center bg-[#ff6b35] hover:bg-[#e55a2b] text-white px-6 py-3 rounded-lg font-semibold transition-colors"
                   >
-                    Solicitar Orçamento
+                    Solicitar Orcamento
                     <ArrowRight className="ml-2" size={18} />
                   </a>
                 </div>
@@ -218,7 +223,7 @@ export default function Servicos() {
             {getContent('cta_subtitle', 'Entre em contato e receba um orçamento personalizado sem compromisso')}
           </p>
           <a
-            href="https://wa.me/5547989100709?text=Olá,%20gostaria%20de%20solicitar%20um%20orçamento"
+            href={`https://wa.me/${whatsappNumero}?text=${encodeURIComponent('Ola, gostaria de solicitar um orcamento')}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center bg-[#ff6b35] hover:bg-[#e55a2b] px-8 py-4 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg"

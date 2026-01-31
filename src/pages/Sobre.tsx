@@ -3,6 +3,12 @@ import { usePageContent } from '../hooks/usePageContent';
 
 export default function Sobre() {
   const { getContent } = usePageContent('sobre');
+  const { get: getGeral } = usePageContent('inicio');
+  
+  // WhatsApp configuravel
+  const whatsappNumero = getGeral('whatsapp_numero', '5547989100709');
+  const whatsappMensagem = getGeral('whatsapp_mensagem', 'Ola, gostaria de conhecer melhor os servicos da A Calhas');
+  const whatsappLink = `https://wa.me/${whatsappNumero}?text=${encodeURIComponent(whatsappMensagem)}`;
 
   const values = [
     {
@@ -178,7 +184,7 @@ export default function Sobre() {
             {getContent('cta_subtitle', 'Entre em contato e descubra como podemos transformar seu projeto em realidade')}
           </p>
           <a
-            href="https://wa.me/5547989100709?text=Olá,%20gostaria%20de%20conhecer%20melhor%20os%20serviços%20da%20A%20Calhas"
+            href={whatsappLink}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center bg-[#ff6b35] hover:bg-[#e55a2b] text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg"

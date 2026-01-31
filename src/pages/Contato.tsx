@@ -5,6 +5,10 @@ import { usePageContent } from '../hooks/usePageContent';
 
 export default function Contato() {
   const { getContent } = usePageContent('contato');
+  const { get: getGeral } = usePageContent('inicio');
+  
+  // WhatsApp configuravel
+  const whatsappNumero = getGeral('whatsapp_numero', '5547989100709');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -112,7 +116,7 @@ export default function Contato() {
 
               <div className="space-y-6">
                 <a
-                  href={`https://wa.me/55${phone.replace(/\D/g, '')}`}
+                  href={`https://wa.me/${whatsappNumero}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-start space-x-4 p-6 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors group"
@@ -335,7 +339,7 @@ export default function Contato() {
             {getContent('whatsapp_cta_subtitle', 'Entre em contato via WhatsApp para um atendimento rápido e personalizado')}
           </p>
           <a
-            href={`https://wa.me/55${phone.replace(/\D/g, '')}?text=Olá,%20gostaria%20de%20solicitar%20um%20orçamento`}
+            href={`https://wa.me/${whatsappNumero}?text=${encodeURIComponent('Ola, gostaria de solicitar um orcamento')}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg"
