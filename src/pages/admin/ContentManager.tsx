@@ -376,7 +376,7 @@ export default function ContentManager() {
     try {
       const { data, error } = await supabase
         .from('page_content')
-        .select('section_key, content_value')
+        .select('section_key, content')
         .eq('page_name', selectedPage.id);
 
       if (error) throw error;
@@ -384,7 +384,7 @@ export default function ContentManager() {
       const contentMap: ContentData = {};
       (data || []).forEach((item) => {
         if (item.section_key) {
-          contentMap[item.section_key] = item.content_value || '';
+          contentMap[item.section_key] = item.content || '';
         }
       });
 
@@ -421,9 +421,8 @@ export default function ContentManager() {
         const { error } = await supabase
           .from('page_content')
           .update({
-            content_value: value,
+            content: value,
             content_type: field.type === 'image' ? 'image' : 'text',
-            updated_at: new Date().toISOString(),
           })
           .eq('id', existing.id);
 
@@ -432,9 +431,8 @@ export default function ContentManager() {
         const { error } = await supabase.from('page_content').insert({
           page_name: selectedPage.id,
           section_key: key,
-          content_value: value,
+          content: value,
           content_type: field.type === 'image' ? 'image' : 'text',
-          order_index: 0,
         });
 
         if (error) throw error;
@@ -473,18 +471,16 @@ export default function ContentManager() {
           await supabase
             .from('page_content')
             .update({
-              content_value: value,
+              content: value,
               content_type: field.type === 'image' ? 'image' : 'text',
-              updated_at: new Date().toISOString(),
             })
             .eq('id', existing.id);
         } else {
           await supabase.from('page_content').insert({
             page_name: selectedPage.id,
             section_key: field.key,
-            content_value: value,
+            content: value,
             content_type: field.type === 'image' ? 'image' : 'text',
-            order_index: 0,
           });
         }
       }

@@ -17,21 +17,19 @@ export function usePageContent(pageName: string) {
       setError(null);
 
       try {
-        // Ajuste 'page_content' / coluna 'page_name' se sua tabela/coluna tiver nome diferente
         const { data, error } = await supabase
           .from('page_content')
-          .select('section_key, content_value')
-          .eq('page_name', pageName)
-          .order('order_index', { ascending: true });
+          .select('section_key, content')
+          .eq('page_name', pageName);
 
         if (error) {
           throw error;
         }
 
-        // transformar array de rows em objeto { section_key: content_value }
+        // transformar array de rows em objeto { section_key: content }
         const map: PageContent = {};
         (data ?? []).forEach((row: any) => {
-          if (row.section_key) map[row.section_key] = row.content_value ?? '';
+          if (row.section_key) map[row.section_key] = row.content ?? '';
         });
 
         if (mounted) {
