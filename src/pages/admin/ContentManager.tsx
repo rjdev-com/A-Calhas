@@ -1,31 +1,308 @@
 import { useState, useEffect } from 'react';
-import { Save, Image, Type, Code, Plus, Trash2 } from 'lucide-react';
+import { Save, ChevronDown, ChevronRight, Check, Loader2, Type, Image as ImageIcon, FileText } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
-type ContentType = 'text' | 'image' | 'html';
-
-interface PageContent {
-  id: string;
-  page_name: string;
-  section_key: string;
-  content_type: ContentType;
-  content_value: string | null;
-  order_index: number;
+// Definição dos campos editáveis de cada página
+interface FieldConfig {
+  key: string;
+  label: string;
+  type: 'text' | 'textarea' | 'image';
+  placeholder: string;
+  defaultValue: string;
 }
 
-const pages = [
-  { id: 'inicio', name: 'Página Inicial' },
-  { id: 'sobre', name: 'Sobre' },
-  { id: 'servicos', name: 'Serviços' },
-  { id: 'portfolio', name: 'Portfólio' },
-  { id: 'contato', name: 'Contato' },
+interface SectionConfig {
+  id: string;
+  title: string;
+  fields: FieldConfig[];
+}
+
+interface PageConfig {
+  id: string;
+  name: string;
+  icon: string;
+  sections: SectionConfig[];
+}
+
+// Configuração completa de todas as páginas e seus campos editáveis
+const pagesConfig: PageConfig[] = [
+  {
+    id: 'inicio',
+    name: 'Página Inicial',
+    icon: '🏠',
+    sections: [
+      {
+        id: 'hero',
+        title: 'Seção Principal (Hero)',
+        fields: [
+          { key: 'hero_title', label: 'Título Principal', type: 'text', placeholder: 'Ex: Calhas de Alumínio de Alta Qualidade em', defaultValue: 'Calhas de Alumínio de Alta Qualidade em' },
+          { key: 'hero_subtitle', label: 'Subtítulo', type: 'textarea', placeholder: 'Descrição do serviço', defaultValue: 'Fabricação e instalação profissional de calhas, rufos e produtos em alumínio 0,5mm e 0,7mm' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'sobre',
+    name: 'Sobre',
+    icon: '📋',
+    sections: [
+      {
+        id: 'hero',
+        title: 'Cabeçalho da Página',
+        fields: [
+          { key: 'hero_title', label: 'Título', type: 'text', placeholder: 'Ex: Sobre a A Calhas', defaultValue: 'Sobre a A Calhas' },
+          { key: 'hero_subtitle', label: 'Subtítulo', type: 'textarea', placeholder: 'Descrição breve', defaultValue: 'Especialistas em fabricação e instalação de calhas, rufos e produtos em alumínio em Joinville - SC' },
+        ],
+      },
+      {
+        id: 'main',
+        title: 'Conteúdo Principal',
+        fields: [
+          { key: 'main_title', label: 'Título da Seção', type: 'text', placeholder: 'Título', defaultValue: 'Compromisso com a Excelência' },
+          { key: 'main_text1', label: 'Parágrafo 1', type: 'textarea', placeholder: 'Primeiro parágrafo', defaultValue: 'A A Calhas é uma empresa especializada em fabricação e instalação de calhas, rufos, pingadeiras e produtos em alumínio, atuando em Joinville e região com foco na qualidade e satisfação dos clientes.' },
+          { key: 'main_text2', label: 'Parágrafo 2', type: 'textarea', placeholder: 'Segundo parágrafo', defaultValue: 'Nossa experiência no mercado nos permite oferecer soluções personalizadas para projetos residenciais, comerciais e industriais, sempre utilizando materiais de primeira qualidade e técnicas de instalação profissionais.' },
+          { key: 'main_text3', label: 'Parágrafo 3', type: 'textarea', placeholder: 'Terceiro parágrafo', defaultValue: 'Trabalhamos com alumínio em duas espessuras (0,5mm e 0,7mm) para atender diferentes necessidades e orçamentos, garantindo sempre a melhor relação custo-benefício para nossos clientes.' },
+          { key: 'main_image', label: 'Imagem Principal', type: 'image', placeholder: 'URL da imagem', defaultValue: 'https://images.pexels.com/photos/1249611/pexels-photo-1249611.jpeg?auto=compress&cs=tinysrgb&w=800' },
+          { key: 'main_stat_number', label: 'Destaque (número/texto)', type: 'text', placeholder: 'Ex: 100%', defaultValue: '100%' },
+          { key: 'main_stat_text', label: 'Descrição do Destaque', type: 'text', placeholder: 'Ex: Compromisso com Qualidade', defaultValue: 'Compromisso com Qualidade' },
+        ],
+      },
+      {
+        id: 'values',
+        title: 'Nossos Valores',
+        fields: [
+          { key: 'values_title', label: 'Título da Seção', type: 'text', placeholder: 'Título', defaultValue: 'Nossos Valores' },
+          { key: 'values_subtitle', label: 'Subtítulo', type: 'text', placeholder: 'Subtítulo', defaultValue: 'Princípios que guiam nosso trabalho diariamente' },
+          { key: 'value1_title', label: 'Valor 1 - Título', type: 'text', placeholder: 'Título', defaultValue: 'Qualidade' },
+          { key: 'value1_description', label: 'Valor 1 - Descrição', type: 'textarea', placeholder: 'Descrição', defaultValue: 'Utilizamos apenas alumínio de primeira linha em todas as nossas fabricações' },
+          { key: 'value2_title', label: 'Valor 2 - Título', type: 'text', placeholder: 'Título', defaultValue: 'Pontualidade' },
+          { key: 'value2_description', label: 'Valor 2 - Descrição', type: 'textarea', placeholder: 'Descrição', defaultValue: 'Cumprimos os prazos estabelecidos com responsabilidade e profissionalismo' },
+          { key: 'value3_title', label: 'Valor 3 - Título', type: 'text', placeholder: 'Título', defaultValue: 'Atendimento' },
+          { key: 'value3_description', label: 'Valor 3 - Descrição', type: 'textarea', placeholder: 'Descrição', defaultValue: 'Atendimento personalizado do orçamento à finalização do projeto' },
+          { key: 'value4_title', label: 'Valor 4 - Título', type: 'text', placeholder: 'Título', defaultValue: 'Expertise' },
+          { key: 'value4_description', label: 'Valor 4 - Descrição', type: 'textarea', placeholder: 'Descrição', defaultValue: 'Equipe experiente e qualificada em fabricação e instalação' },
+        ],
+      },
+      {
+        id: 'benefits',
+        title: 'Por Que Nos Escolher',
+        fields: [
+          { key: 'benefits_title', label: 'Título', type: 'text', placeholder: 'Título', defaultValue: 'Por Que Escolher a A Calhas?' },
+          { key: 'benefits_image', label: 'Imagem', type: 'image', placeholder: 'URL da imagem', defaultValue: 'https://images.pexels.com/photos/259984/pexels-photo-259984.jpeg?auto=compress&cs=tinysrgb&w=800' },
+          { key: 'benefit1', label: 'Benefício 1', type: 'text', placeholder: 'Benefício', defaultValue: 'Fabricação própria com controle total de qualidade' },
+          { key: 'benefit2', label: 'Benefício 2', type: 'text', placeholder: 'Benefício', defaultValue: 'Alumínio em duas espessuras: 0,5mm e 0,7mm' },
+          { key: 'benefit3', label: 'Benefício 3', type: 'text', placeholder: 'Benefício', defaultValue: 'Projetos personalizados conforme suas necessidades' },
+          { key: 'benefit4', label: 'Benefício 4', type: 'text', placeholder: 'Benefício', defaultValue: 'Instalação profissional e segura' },
+          { key: 'benefit5', label: 'Benefício 5', type: 'text', placeholder: 'Benefício', defaultValue: 'Atendimento em Joinville e região' },
+          { key: 'benefit6', label: 'Benefício 6', type: 'text', placeholder: 'Benefício', defaultValue: 'Orçamento sem compromisso' },
+          { key: 'benefit7', label: 'Benefício 7', type: 'text', placeholder: 'Benefício', defaultValue: 'Garantia dos serviços prestados' },
+          { key: 'benefit8', label: 'Benefício 8', type: 'text', placeholder: 'Benefício', defaultValue: 'Acompanhamento durante todo o projeto' },
+        ],
+      },
+      {
+        id: 'highlights',
+        title: 'Destaques',
+        fields: [
+          { key: 'highlight1_title', label: 'Destaque 1 - Título', type: 'text', placeholder: 'Título', defaultValue: 'Fabricação Própria' },
+          { key: 'highlight1_description', label: 'Destaque 1 - Descrição', type: 'textarea', placeholder: 'Descrição', defaultValue: 'Controle total sobre qualidade e prazos de entrega' },
+          { key: 'highlight2_title', label: 'Destaque 2 - Título', type: 'text', placeholder: 'Título', defaultValue: 'Alumínio Premium' },
+          { key: 'highlight2_description', label: 'Destaque 2 - Descrição', type: 'textarea', placeholder: 'Descrição', defaultValue: 'Material de primeira qualidade em 0,5mm e 0,7mm' },
+          { key: 'highlight3_title', label: 'Destaque 3 - Título', type: 'text', placeholder: 'Título', defaultValue: 'Atendimento Local' },
+          { key: 'highlight3_description', label: 'Destaque 3 - Descrição', type: 'textarea', placeholder: 'Descrição', defaultValue: 'Presente em Joinville e toda a região' },
+        ],
+      },
+      {
+        id: 'cta',
+        title: 'Chamada para Ação (CTA)',
+        fields: [
+          { key: 'cta_title', label: 'Título', type: 'text', placeholder: 'Título', defaultValue: 'Vamos Trabalhar Juntos?' },
+          { key: 'cta_subtitle', label: 'Subtítulo', type: 'textarea', placeholder: 'Subtítulo', defaultValue: 'Entre em contato e descubra como podemos transformar seu projeto em realidade' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'servicos',
+    name: 'Serviços',
+    icon: '🔧',
+    sections: [
+      {
+        id: 'hero',
+        title: 'Cabeçalho da Página',
+        fields: [
+          { key: 'hero_title', label: 'Título', type: 'text', placeholder: 'Título', defaultValue: 'Nossos Serviços' },
+          { key: 'hero_subtitle', label: 'Subtítulo', type: 'textarea', placeholder: 'Subtítulo', defaultValue: 'Soluções completas em alumínio de alta qualidade para projetos residenciais, comerciais e industriais em Joinville e região' },
+        ],
+      },
+      {
+        id: 'aluminio',
+        title: 'Seção Alumínio',
+        fields: [
+          { key: 'aluminio_title', label: 'Título', type: 'text', placeholder: 'Título', defaultValue: 'Alumínio de Primeira Qualidade' },
+          { key: 'aluminio_intro', label: 'Introdução', type: 'textarea', placeholder: 'Texto introdutório', defaultValue: 'Todos os nossos produtos são fabricados com alumínio de alta qualidade, disponível em duas espessuras para atender diferentes necessidades e orçamentos:' },
+          { key: 'aluminio_05_title', label: 'Alumínio 0,5mm - Título', type: 'text', placeholder: 'Título', defaultValue: 'Alumínio 0,5mm' },
+          { key: 'aluminio_05_benefit1', label: '0,5mm - Benefício 1', type: 'text', placeholder: 'Benefício', defaultValue: 'Opção econômica com excelente custo-benefício' },
+          { key: 'aluminio_05_benefit2', label: '0,5mm - Benefício 2', type: 'text', placeholder: 'Benefício', defaultValue: 'Ideal para projetos residenciais' },
+          { key: 'aluminio_05_benefit3', label: '0,5mm - Benefício 3', type: 'text', placeholder: 'Benefício', defaultValue: 'Durabilidade comprovada' },
+          { key: 'aluminio_07_title', label: 'Alumínio 0,7mm - Título', type: 'text', placeholder: 'Título', defaultValue: 'Alumínio 0,7mm' },
+          { key: 'aluminio_07_benefit1', label: '0,7mm - Benefício 1', type: 'text', placeholder: 'Benefício', defaultValue: 'Resistência reforçada para maior durabilidade' },
+          { key: 'aluminio_07_benefit2', label: '0,7mm - Benefício 2', type: 'text', placeholder: 'Benefício', defaultValue: 'Recomendado para projetos comerciais' },
+          { key: 'aluminio_07_benefit3', label: '0,7mm - Benefício 3', type: 'text', placeholder: 'Benefício', defaultValue: 'Máxima proteção e vida útil prolongada' },
+        ],
+      },
+      {
+        id: 'service1',
+        title: 'Serviço: Calhas de Alumínio',
+        fields: [
+          { key: 'service1_title', label: 'Título', type: 'text', placeholder: 'Título', defaultValue: 'Calhas de Alumínio' },
+          { key: 'service1_description', label: 'Descrição', type: 'textarea', placeholder: 'Descrição', defaultValue: 'Fabricação e instalação de calhas residenciais e comerciais' },
+          { key: 'service1_detail1', label: 'Detalhe 1', type: 'text', placeholder: 'Detalhe', defaultValue: 'Alumínio 0,5mm - opção econômica e durável' },
+          { key: 'service1_detail2', label: 'Detalhe 2', type: 'text', placeholder: 'Detalhe', defaultValue: 'Alumínio 0,7mm - resistência reforçada' },
+          { key: 'service1_detail3', label: 'Detalhe 3', type: 'text', placeholder: 'Detalhe', defaultValue: 'Modelos personalizados conforme necessidade' },
+          { key: 'service1_detail4', label: 'Detalhe 4', type: 'text', placeholder: 'Detalhe', defaultValue: 'Proteção eficiente contra águas pluviais' },
+          { key: 'service1_detail5', label: 'Detalhe 5', type: 'text', placeholder: 'Detalhe', defaultValue: 'Acabamento profissional' },
+        ],
+      },
+      {
+        id: 'service2',
+        title: 'Serviço: Rufos e Pingadeiras',
+        fields: [
+          { key: 'service2_title', label: 'Título', type: 'text', placeholder: 'Título', defaultValue: 'Rufos e Pingadeiras' },
+          { key: 'service2_description', label: 'Descrição', type: 'textarea', placeholder: 'Descrição', defaultValue: 'Proteção completa para telhados e estruturas' },
+          { key: 'service2_detail1', label: 'Detalhe 1', type: 'text', placeholder: 'Detalhe', defaultValue: 'Vedação perfeita em encontros de telhado' },
+          { key: 'service2_detail2', label: 'Detalhe 2', type: 'text', placeholder: 'Detalhe', defaultValue: 'Proteção contra infiltrações' },
+          { key: 'service2_detail3', label: 'Detalhe 3', type: 'text', placeholder: 'Detalhe', defaultValue: 'Acabamento em alumínio durável' },
+          { key: 'service2_detail4', label: 'Detalhe 4', type: 'text', placeholder: 'Detalhe', defaultValue: 'Resistente à corrosão' },
+          { key: 'service2_detail5', label: 'Detalhe 5', type: 'text', placeholder: 'Detalhe', defaultValue: 'Instalação precisa e profissional' },
+        ],
+      },
+      {
+        id: 'service3',
+        title: 'Serviço: Colarinhos de Chaminé',
+        fields: [
+          { key: 'service3_title', label: 'Título', type: 'text', placeholder: 'Título', defaultValue: 'Colarinhos de Chaminé' },
+          { key: 'service3_description', label: 'Descrição', type: 'textarea', placeholder: 'Descrição', defaultValue: 'Vedação profissional para chaminés' },
+          { key: 'service3_detail1', label: 'Detalhe 1', type: 'text', placeholder: 'Detalhe', defaultValue: 'Vedação completa contra água e vento' },
+          { key: 'service3_detail2', label: 'Detalhe 2', type: 'text', placeholder: 'Detalhe', defaultValue: 'Fabricação em alumínio de alta qualidade' },
+          { key: 'service3_detail3', label: 'Detalhe 3', type: 'text', placeholder: 'Detalhe', defaultValue: 'Modelos adaptáveis a diferentes tipos de chaminé' },
+          { key: 'service3_detail4', label: 'Detalhe 4', type: 'text', placeholder: 'Detalhe', defaultValue: 'Instalação técnica e segura' },
+          { key: 'service3_detail5', label: 'Detalhe 5', type: 'text', placeholder: 'Detalhe', defaultValue: 'Durabilidade garantida' },
+        ],
+      },
+      {
+        id: 'service4',
+        title: 'Serviço: Chaminés para Churrasqueiras',
+        fields: [
+          { key: 'service4_title', label: 'Título', type: 'text', placeholder: 'Título', defaultValue: 'Chaminés para Churrasqueiras' },
+          { key: 'service4_description', label: 'Descrição', type: 'textarea', placeholder: 'Descrição', defaultValue: 'Exaustão eficiente para áreas de churrasco' },
+          { key: 'service4_detail1', label: 'Detalhe 1', type: 'text', placeholder: 'Detalhe', defaultValue: 'Design funcional e estético' },
+          { key: 'service4_detail2', label: 'Detalhe 2', type: 'text', placeholder: 'Detalhe', defaultValue: 'Alumínio resistente a altas temperaturas' },
+          { key: 'service4_detail3', label: 'Detalhe 3', type: 'text', placeholder: 'Detalhe', defaultValue: 'Tiragem de fumaça eficiente' },
+          { key: 'service4_detail4', label: 'Detalhe 4', type: 'text', placeholder: 'Detalhe', defaultValue: 'Personalização conforme projeto' },
+          { key: 'service4_detail5', label: 'Detalhe 5', type: 'text', placeholder: 'Detalhe', defaultValue: 'Instalação completa' },
+        ],
+      },
+      {
+        id: 'service5',
+        title: 'Serviço: Coifas para Cozinhas',
+        fields: [
+          { key: 'service5_title', label: 'Título', type: 'text', placeholder: 'Título', defaultValue: 'Coifas para Cozinhas' },
+          { key: 'service5_description', label: 'Descrição', type: 'textarea', placeholder: 'Descrição', defaultValue: 'Exaustão profissional para ambientes' },
+          { key: 'service5_detail1', label: 'Detalhe 1', type: 'text', placeholder: 'Detalhe', defaultValue: 'Fabricação personalizada em alumínio' },
+          { key: 'service5_detail2', label: 'Detalhe 2', type: 'text', placeholder: 'Detalhe', defaultValue: 'Modelos residenciais e comerciais' },
+          { key: 'service5_detail3', label: 'Detalhe 3', type: 'text', placeholder: 'Detalhe', defaultValue: 'Eficiência na exaustão de vapores' },
+          { key: 'service5_detail4', label: 'Detalhe 4', type: 'text', placeholder: 'Detalhe', defaultValue: 'Acabamento de alta qualidade' },
+          { key: 'service5_detail5', label: 'Detalhe 5', type: 'text', placeholder: 'Detalhe', defaultValue: 'Instalação profissional' },
+        ],
+      },
+      {
+        id: 'service6',
+        title: 'Serviço: Condutores Pluviais',
+        fields: [
+          { key: 'service6_title', label: 'Título', type: 'text', placeholder: 'Título', defaultValue: 'Condutores Pluviais' },
+          { key: 'service6_description', label: 'Descrição', type: 'textarea', placeholder: 'Descrição', defaultValue: 'Sistema completo de escoamento de água' },
+          { key: 'service6_detail1', label: 'Detalhe 1', type: 'text', placeholder: 'Detalhe', defaultValue: 'Alumínio 0,5mm e 0,7mm' },
+          { key: 'service6_detail2', label: 'Detalhe 2', type: 'text', placeholder: 'Detalhe', defaultValue: 'Direcionamento eficiente de água pluvial' },
+          { key: 'service6_detail3', label: 'Detalhe 3', type: 'text', placeholder: 'Detalhe', defaultValue: 'Modelos redondos e quadrados' },
+          { key: 'service6_detail4', label: 'Detalhe 4', type: 'text', placeholder: 'Detalhe', defaultValue: 'Fixações seguras e discretas' },
+          { key: 'service6_detail5', label: 'Detalhe 5', type: 'text', placeholder: 'Detalhe', defaultValue: 'Integração perfeita com calhas' },
+        ],
+      },
+      {
+        id: 'cta',
+        title: 'Chamada para Ação (CTA)',
+        fields: [
+          { key: 'cta_title', label: 'Título', type: 'text', placeholder: 'Título', defaultValue: 'Pronto para Iniciar seu Projeto?' },
+          { key: 'cta_subtitle', label: 'Subtítulo', type: 'textarea', placeholder: 'Subtítulo', defaultValue: 'Entre em contato e receba um orçamento personalizado sem compromisso' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'contato',
+    name: 'Contato',
+    icon: '📞',
+    sections: [
+      {
+        id: 'hero',
+        title: 'Cabeçalho da Página',
+        fields: [
+          { key: 'hero_title', label: 'Título', type: 'text', placeholder: 'Título', defaultValue: 'Entre em Contato' },
+          { key: 'hero_subtitle', label: 'Subtítulo', type: 'textarea', placeholder: 'Subtítulo', defaultValue: 'Estamos prontos para atender você. Solicite um orçamento sem compromisso' },
+        ],
+      },
+      {
+        id: 'info',
+        title: 'Informações de Contato',
+        fields: [
+          { key: 'info_title', label: 'Título', type: 'text', placeholder: 'Título', defaultValue: 'Informações de Contato' },
+          { key: 'info_subtitle', label: 'Subtítulo', type: 'textarea', placeholder: 'Subtítulo', defaultValue: 'Entre em contato conosco através dos canais abaixo ou preencha o formulário. Responderemos o mais breve possível.' },
+          { key: 'phone', label: 'Telefone/WhatsApp', type: 'text', placeholder: '(47) 99999-9999', defaultValue: '(47) 98910-0709' },
+          { key: 'email', label: 'E-mail', type: 'text', placeholder: 'email@exemplo.com', defaultValue: 'contato@acalhas.com.br' },
+          { key: 'address_title', label: 'Título do Endereço', type: 'text', placeholder: 'Localização', defaultValue: 'Localização' },
+          { key: 'address', label: 'Endereço', type: 'text', placeholder: 'Cidade - Estado', defaultValue: 'Joinville - SC' },
+          { key: 'address_subtitle', label: 'Subtítulo do Endereço', type: 'text', placeholder: 'Região de atendimento', defaultValue: 'Atendemos Joinville e região' },
+        ],
+      },
+      {
+        id: 'social',
+        title: 'Redes Sociais',
+        fields: [
+          { key: 'social_title', label: 'Título', type: 'text', placeholder: 'Título', defaultValue: 'Siga-nos nas Redes Sociais' },
+          { key: 'instagram_url', label: 'URL do Instagram', type: 'text', placeholder: 'https://instagram.com/...', defaultValue: 'https://instagram.com/acalhasof' },
+          { key: 'facebook_url', label: 'URL do Facebook', type: 'text', placeholder: 'https://facebook.com/...', defaultValue: 'https://facebook.com/acalhasof' },
+        ],
+      },
+      {
+        id: 'form',
+        title: 'Formulário',
+        fields: [
+          { key: 'form_title', label: 'Título do Formulário', type: 'text', placeholder: 'Título', defaultValue: 'Solicite seu Orçamento' },
+        ],
+      },
+      {
+        id: 'whatsapp_cta',
+        title: 'CTA WhatsApp',
+        fields: [
+          { key: 'whatsapp_cta_title', label: 'Título', type: 'text', placeholder: 'Título', defaultValue: 'Prefere Falar Diretamente?' },
+          { key: 'whatsapp_cta_subtitle', label: 'Subtítulo', type: 'textarea', placeholder: 'Subtítulo', defaultValue: 'Entre em contato via WhatsApp para um atendimento rápido e personalizado' },
+        ],
+      },
+    ],
+  },
 ];
 
+interface ContentData {
+  [key: string]: string;
+}
+
 export default function ContentManager() {
-  const [selectedPage, setSelectedPage] = useState('inicio');
-  const [contents, setContents] = useState<PageContent[]>([]);
+  const [selectedPage, setSelectedPage] = useState<PageConfig>(pagesConfig[0]);
+  const [content, setContent] = useState<ContentData>({});
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [savedFields, setSavedFields] = useState<Set<string>>(new Set());
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['hero']));
   const [uploadingImage, setUploadingImage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -37,33 +314,78 @@ export default function ContentManager() {
     try {
       const { data, error } = await supabase
         .from('page_content')
-        .select('*')
-        .eq('page_name', selectedPage)
-        .order('order_index', { ascending: true });
+        .select('section_key, content_value')
+        .eq('page_name', selectedPage.id);
 
       if (error) throw error;
-      setContents(data || []);
+
+      const contentMap: ContentData = {};
+      (data || []).forEach((item) => {
+        if (item.section_key) {
+          contentMap[item.section_key] = item.content_value || '';
+        }
+      });
+
+      setContent(contentMap);
     } catch (error) {
       console.error('Erro ao carregar conteúdo:', error);
-      alert('Erro ao carregar conteúdo da página');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSave = async (content: PageContent) => {
+  const handleFieldChange = (key: string, value: string) => {
+    setContent((prev) => ({ ...prev, [key]: value }));
+    setSavedFields((prev) => {
+      const next = new Set(prev);
+      next.delete(key);
+      return next;
+    });
+  };
+
+  const handleSaveField = async (key: string, field: FieldConfig) => {
     setSaving(true);
     try {
-      const { error } = await supabase
+      const value = content[key] ?? field.defaultValue;
+
+      const { data: existing } = await supabase
         .from('page_content')
-        .upsert({
-          ...content,
-          updated_at: new Date().toISOString(),
+        .select('id')
+        .eq('page_name', selectedPage.id)
+        .eq('section_key', key)
+        .single();
+
+      if (existing) {
+        const { error } = await supabase
+          .from('page_content')
+          .update({
+            content_value: value,
+            content_type: field.type === 'image' ? 'image' : 'text',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existing.id);
+
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('page_content').insert({
+          page_name: selectedPage.id,
+          section_key: key,
+          content_value: value,
+          content_type: field.type === 'image' ? 'image' : 'text',
+          order_index: 0,
         });
 
-      if (error) throw error;
-      alert('Conteúdo salvo com sucesso!');
-      loadPageContent();
+        if (error) throw error;
+      }
+
+      setSavedFields((prev) => new Set(prev).add(key));
+      setTimeout(() => {
+        setSavedFields((prev) => {
+          const next = new Set(prev);
+          next.delete(key);
+          return next;
+        });
+      }, 2000);
     } catch (error) {
       console.error('Erro ao salvar:', error);
       alert('Erro ao salvar conteúdo');
@@ -72,27 +394,76 @@ export default function ContentManager() {
     }
   };
 
-  const handleImageUpload = async (contentId: string, file: File) => {
-    setUploadingImage(contentId);
+  const handleSaveAllSection = async (section: SectionConfig) => {
+    setSaving(true);
+    try {
+      for (const field of section.fields) {
+        const value = content[field.key] ?? field.defaultValue;
+
+        const { data: existing } = await supabase
+          .from('page_content')
+          .select('id')
+          .eq('page_name', selectedPage.id)
+          .eq('section_key', field.key)
+          .single();
+
+        if (existing) {
+          await supabase
+            .from('page_content')
+            .update({
+              content_value: value,
+              content_type: field.type === 'image' ? 'image' : 'text',
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', existing.id);
+        } else {
+          await supabase.from('page_content').insert({
+            page_name: selectedPage.id,
+            section_key: field.key,
+            content_value: value,
+            content_type: field.type === 'image' ? 'image' : 'text',
+            order_index: 0,
+          });
+        }
+      }
+
+      const newSaved = new Set(savedFields);
+      section.fields.forEach((f) => newSaved.add(f.key));
+      setSavedFields(newSaved);
+
+      setTimeout(() => {
+        setSavedFields((prev) => {
+          const next = new Set(prev);
+          section.fields.forEach((f) => next.delete(f.key));
+          return next;
+        });
+      }, 2000);
+    } catch (error) {
+      console.error('Erro ao salvar seção:', error);
+      alert('Erro ao salvar seção');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleImageUpload = async (key: string, file: File, field: FieldConfig) => {
+    setUploadingImage(key);
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${selectedPage}_${Date.now()}.${fileExt}`;
-      const filePath = `${fileName}`;
+      const fileName = `${selectedPage.id}_${key}_${Date.now()}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from('page-images')
-        .upload(filePath, file, { upsert: true });
+        .upload(fileName, file, { upsert: true });
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('page-images')
-        .getPublicUrl(filePath);
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('page-images').getPublicUrl(fileName);
 
-      const content = contents.find(c => c.id === contentId);
-      if (content) {
-        await handleSave({ ...content, content_value: publicUrl });
-      }
+      handleFieldChange(key, publicUrl);
+      await handleSaveField(key, field);
     } catch (error) {
       console.error('Erro ao fazer upload:', error);
       alert('Erro ao fazer upload da imagem');
@@ -101,211 +472,184 @@ export default function ContentManager() {
     }
   };
 
-  const handleAddContent = async () => {
-    const newContent: Partial<PageContent> = {
-      page_name: selectedPage,
-      section_key: `new_section_${Date.now()}`,
-      content_type: 'text',
-      content_value: '',
-      order_index: contents.length,
-    };
-
-    try {
-      const { data, error } = await supabase
-        .from('page_content')
-        .insert(newContent)
-        .select()
-        .single();
-
-      if (error) throw error;
-      setContents([...contents, data]);
-    } catch (error) {
-      console.error('Erro ao adicionar conteúdo:', error);
-      alert('Erro ao adicionar novo conteúdo');
-    }
+  const toggleSection = (sectionId: string) => {
+    setExpandedSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(sectionId)) {
+        next.delete(sectionId);
+      } else {
+        next.add(sectionId);
+      }
+      return next;
+    });
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir este conteúdo?')) return;
-
-    try {
-      const { error } = await supabase
-        .from('page_content')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-      setContents(contents.filter(c => c.id !== id));
-    } catch (error) {
-      console.error('Erro ao deletar:', error);
-      alert('Erro ao deletar conteúdo');
-    }
-  };
-
-  const getContentIcon = (type: ContentType) => {
+  const getFieldIcon = (type: string) => {
     switch (type) {
-      case 'text': return <Type size={16} />;
-      case 'image': return <Image size={16} />;
-      case 'html': return <Code size={16} />;
+      case 'image':
+        return <ImageIcon size={16} className="text-purple-500" />;
+      case 'textarea':
+        return <FileText size={16} className="text-blue-500" />;
+      default:
+        return <Type size={16} className="text-gray-500" />;
     }
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Gerenciar Conteúdo das Páginas</h1>
-        <button
-          onClick={handleAddContent}
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
-        >
-          <Plus size={20} />
-          Adicionar Conteúdo
-        </button>
+    <div className="p-6 max-w-6xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Gerenciar Conteúdo</h1>
+        <p className="text-gray-600">Edite os textos e imagens das páginas do site</p>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
-          Selecione a Página
-        </label>
-        <select
-          value={selectedPage}
-          onChange={(e) => setSelectedPage(e.target.value)}
-          className="w-full md:w-64 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        >
-          {pages.map(page => (
-            <option key={page.id} value={page.id}>{page.name}</option>
+      {/* Seletor de Página */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+        <label className="block text-sm font-medium text-gray-700 mb-3">Selecione a Página</label>
+        <div className="flex flex-wrap gap-2">
+          {pagesConfig.map((page) => (
+            <button
+              key={page.id}
+              onClick={() => setSelectedPage(page)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                selectedPage.id === page.id
+                  ? 'bg-[#1e3a5f] text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              <span>{page.icon}</span>
+              <span>{page.name}</span>
+            </button>
           ))}
-        </select>
+        </div>
       </div>
 
       {loading ? (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-300 border-t-blue-600"></div>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 size={40} className="animate-spin text-[#1e3a5f]" />
         </div>
       ) : (
         <div className="space-y-4">
-          {contents.map((content) => (
-            <div key={content.id} className="bg-white rounded-lg shadow-md p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Chave da Seção
-                  </label>
-                  <input
-                    type="text"
-                    value={content.section_key}
-                    onChange={(e) => {
-                      const updated = contents.map(c =>
-                        c.id === content.id ? { ...c, section_key: e.target.value } : c
-                      );
-                      setContents(updated);
-                    }}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
+          {selectedPage.sections.map((section) => (
+            <div key={section.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              {/* Header da Seção */}
+              <button
+                onClick={() => toggleSection(section.id)}
+                className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  {expandedSections.has(section.id) ? (
+                    <ChevronDown size={20} className="text-gray-500" />
+                  ) : (
+                    <ChevronRight size={20} className="text-gray-500" />
+                  )}
+                  <h2 className="text-lg font-semibold text-gray-800">{section.title}</h2>
+                  <span className="text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                    {section.fields.length} campos
+                  </span>
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Tipo de Conteúdo
-                  </label>
-                  <select
-                    value={content.content_type}
-                    onChange={(e) => {
-                      const updated = contents.map(c =>
-                        c.id === content.id ? { ...c, content_type: e.target.value as ContentType } : c
-                      );
-                      setContents(updated);
-                    }}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="text">Texto</option>
-                    <option value="image">Imagem</option>
-                    <option value="html">HTML</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                  {getContentIcon(content.content_type)}
-                  Conteúdo
-                </label>
-
-                {content.content_type === 'image' ? (
-                  <div className="space-y-3">
-                    {content.content_value && (
-                      <img
-                        src={content.content_value}
-                        alt="Preview"
-                        className="w-full max-w-md h-48 object-cover rounded-lg border"
-                      />
-                    )}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleImageUpload(content.id, file);
-                      }}
-                      disabled={uploadingImage === content.id}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2"
-                    />
-                    {uploadingImage === content.id && (
-                      <p className="text-sm text-blue-600">Fazendo upload...</p>
-                    )}
-                  </div>
-                ) : content.content_type === 'html' ? (
-                  <textarea
-                    value={content.content_value || ''}
-                    onChange={(e) => {
-                      const updated = contents.map(c =>
-                        c.id === content.id ? { ...c, content_value: e.target.value } : c
-                      );
-                      setContents(updated);
-                    }}
-                    rows={6}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
-                  />
-                ) : (
-                  <textarea
-                    value={content.content_value || ''}
-                    onChange={(e) => {
-                      const updated = contents.map(c =>
-                        c.id === content.id ? { ...c, content_value: e.target.value } : c
-                      );
-                      setContents(updated);
-                    }}
-                    rows={4}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                )}
-              </div>
-
-              <div className="flex gap-3">
                 <button
-                  onClick={() => handleSave(content)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSaveAllSection(section);
+                  }}
                   disabled={saving}
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors disabled:bg-gray-400"
+                  className="flex items-center gap-2 bg-[#ff6b35] hover:bg-[#e55a2b] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
                 >
                   <Save size={16} />
-                  {saving ? 'Salvando...' : 'Salvar'}
+                  Salvar Seção
                 </button>
-                <button
-                  onClick={() => handleDelete(content.id)}
-                  className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
-                >
-                  <Trash2 size={16} />
-                  Excluir
-                </button>
-              </div>
+              </button>
+
+              {/* Conteúdo da Seção */}
+              {expandedSections.has(section.id) && (
+                <div className="border-t border-gray-200 p-4 space-y-4">
+                  {section.fields.map((field) => (
+                    <div key={field.key} className="relative">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        {getFieldIcon(field.type)}
+                        {field.label}
+                      </label>
+
+                      {field.type === 'image' ? (
+                        <div className="space-y-3">
+                          {(content[field.key] || field.defaultValue) && (
+                            <img
+                              src={content[field.key] || field.defaultValue}
+                              alt="Preview"
+                              className="w-full max-w-md h-48 object-cover rounded-lg border border-gray-200"
+                            />
+                          )}
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="text"
+                              value={content[field.key] ?? field.defaultValue}
+                              onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                              placeholder={field.placeholder}
+                              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ff6b35] focus:border-transparent outline-none"
+                            />
+                            <label className="cursor-pointer bg-purple-100 hover:bg-purple-200 text-purple-700 px-4 py-2 rounded-lg font-medium transition-colors">
+                              {uploadingImage === field.key ? 'Enviando...' : 'Upload'}
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) handleImageUpload(field.key, file, field);
+                                }}
+                                disabled={uploadingImage === field.key}
+                              />
+                            </label>
+                          </div>
+                        </div>
+                      ) : field.type === 'textarea' ? (
+                        <textarea
+                          value={content[field.key] ?? field.defaultValue}
+                          onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                          placeholder={field.placeholder}
+                          rows={3}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ff6b35] focus:border-transparent outline-none resize-none"
+                        />
+                      ) : (
+                        <input
+                          type="text"
+                          value={content[field.key] ?? field.defaultValue}
+                          onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                          placeholder={field.placeholder}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ff6b35] focus:border-transparent outline-none"
+                        />
+                      )}
+
+                      <div className="flex items-center justify-between mt-2">
+                        <span className="text-xs text-gray-400">Chave: {field.key}</span>
+                        <button
+                          onClick={() => handleSaveField(field.key, field)}
+                          disabled={saving}
+                          className={`flex items-center gap-1 px-3 py-1 rounded text-sm font-medium transition-all ${
+                            savedFields.has(field.key)
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                          }`}
+                        >
+                          {savedFields.has(field.key) ? (
+                            <>
+                              <Check size={14} />
+                              Salvo
+                            </>
+                          ) : (
+                            <>
+                              <Save size={14} />
+                              Salvar
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
-
-          {contents.length === 0 && (
-            <div className="text-center py-12 bg-white rounded-lg">
-              <p className="text-gray-500">Nenhum conteúdo cadastrado para esta página.</p>
-              <p className="text-gray-400 text-sm mt-2">Clique em "Adicionar Conteúdo" para começar.</p>
-            </div>
-          )}
         </div>
       )}
     </div>
