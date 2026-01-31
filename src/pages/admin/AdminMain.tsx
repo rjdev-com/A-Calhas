@@ -6,10 +6,6 @@ import Dashboard from './Dashboard';
 import ProjectsManager from './ProjectsManager';
 import ProjectForm from './ProjectForm';
 import ContentManager from './ContentManager';
-import CustomersManager from './CustomersManager';
-import QuotesManager from './QuotesManager';
-import QuoteForm from './QuoteForm';
-import SettingsManager from './SettingsManager';
 import type { Database } from '../../lib/database.types';
 
 type Project = Database['public']['Tables']['projects']['Row'];
@@ -19,11 +15,7 @@ type AdminPage =
   | 'projects'
   | 'new-project'
   | 'edit-project'
-  | 'content'
-  | 'customers'
-  | 'quotes'
-  | 'new-quote'
-  | 'settings';
+  | 'content';
 
 export default function AdminMain() {
   const { user, loading } = useAuth();
@@ -43,7 +35,7 @@ export default function AdminMain() {
   }
 
   const handleNavigate = (
-    page: 'dashboard' | 'projects' | 'content' | 'customers' | 'quotes' | 'settings'
+    page: 'dashboard' | 'projects' | 'content'
   ) => {
     setCurrentPage(page);
     setEditingProject(null);
@@ -102,18 +94,6 @@ export default function AdminMain() {
       case 'content':
         return <ContentManager />;
 
-      case 'customers':
-        return <CustomersManager />;
-
-      case 'quotes':
-        return <QuotesManager />;
-
-      case 'new-quote':
-        return <QuoteForm />;
-
-      case 'settings':
-        return <SettingsManager />;
-
       default:
         return <Dashboard />;
     }
@@ -124,12 +104,6 @@ export default function AdminMain() {
       ? 'dashboard'
       : currentPage === 'content'
       ? 'content'
-      : currentPage === 'customers'
-      ? 'customers'
-      : currentPage === 'quotes' || currentPage === 'new-quote'
-      ? 'quotes'
-      : currentPage === 'settings'
-      ? 'settings'
       : 'projects';
 
   return (
