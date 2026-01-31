@@ -11,26 +11,26 @@ export default function Inicio({ onNavigate }: InicioProps) {
   const services = [
     {
       icon: Home,
-      title: 'Calhas de Alumínio',
-      description: 'Fabricação e instalação de calhas residenciais e comerciais em alumínio 0,5mm e 0,7mm',
+      title: get('service1_title', 'Calhas de Alumínio'),
+      description: get('service1_description', 'Fabricação e instalação de calhas residenciais e comerciais em alumínio 0,5mm e 0,7mm'),
       category: 'calhas'
     },
     {
       icon: Shield,
-      title: 'Rufos e Pingadeiras',
-      description: 'Proteção completa para telhados e estruturas com acabamento profissional',
+      title: get('service2_title', 'Rufos e Pingadeiras'),
+      description: get('service2_description', 'Proteção completa para telhados e estruturas com acabamento profissional'),
       category: 'rufos'
     },
     {
       icon: Building2,
-      title: 'Colarinhos de Chaminé',
-      description: 'Vedação perfeita para chaminés com materiais de alta durabilidade',
+      title: get('service3_title', 'Colarinhos de Chaminé'),
+      description: get('service3_description', 'Vedação perfeita para chaminés com materiais de alta durabilidade'),
       category: 'colarinhos'
     },
     {
       icon: Wrench,
-      title: 'Chaminés e Coifas',
-      description: 'Chaminés para churrasqueiras e coifas para cozinhas em alumínio',
+      title: get('service4_title', 'Chaminés e Coifas'),
+      description: get('service4_description', 'Chaminés para churrasqueiras e coifas para cozinhas em alumínio'),
       category: 'chamines'
     },
   ];
@@ -38,18 +38,18 @@ export default function Inicio({ onNavigate }: InicioProps) {
   const benefits = [
     {
       icon: Award,
-      title: 'Qualidade Garantida',
-      description: 'Alumínio de primeira qualidade com espessuras de 0,5mm e 0,7mm'
+      title: get('benefit1_title', 'Qualidade Garantida'),
+      description: get('benefit1_description', 'Alumínio de primeira qualidade com espessuras de 0,5mm e 0,7mm')
     },
     {
       icon: Clock,
-      title: 'Entrega Rápida',
-      description: 'Fabricação própria para agilidade no atendimento'
+      title: get('benefit2_title', 'Entrega Rápida'),
+      description: get('benefit2_description', 'Fabricação própria para agilidade no atendimento')
     },
     {
       icon: Shield,
-      title: 'Durabilidade',
-      description: 'Produtos resistentes à corrosão e intempéries'
+      title: get('benefit3_title', 'Durabilidade'),
+      description: get('benefit3_description', 'Produtos resistentes à corrosão e intempéries')
     },
   ];
 
@@ -73,14 +73,14 @@ export default function Inicio({ onNavigate }: InicioProps) {
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center bg-[#ff6b35] hover:bg-[#e55a2b] text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg"
               >
-                Solicitar Orçamento Grátis
+                {get('hero_button1', 'Solicitar Orçamento Grátis')}
                 <ArrowRight className="ml-2" size={20} />
               </a>
               <button
                 onClick={() => onNavigate('portfolio')}
                 className="inline-flex items-center justify-center bg-white hover:bg-gray-100 text-[#1e3a5f] px-8 py-4 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg"
               >
-                Quer Trabalhos Como Esses?
+                {get('hero_button2', 'Quer Trabalhos Como Esses?')}
                 <ChevronRight className="ml-2" size={20} />
               </button>
             </div>
@@ -107,8 +107,8 @@ export default function Inicio({ onNavigate }: InicioProps) {
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-[#1e3a5f] mb-4">Nossos Serviços</h2>
-            <p className="text-xl text-gray-600">Soluções completas em alumínio para sua obra</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#1e3a5f] mb-4">{get('services_title', 'Nossos Serviços')}</h2>
+            <p className="text-xl text-gray-600">{get('services_subtitle', 'Soluções completas em alumínio para sua obra')}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -144,7 +144,7 @@ export default function Inicio({ onNavigate }: InicioProps) {
               onClick={() => onNavigate('servicos')}
               className="inline-flex items-center bg-[#1e3a5f] hover:bg-[#2d4d70] text-white px-8 py-3 rounded-lg font-semibold transition-colors"
             >
-              Ver Todos os Serviços
+              {get('services_button', 'Ver Todos os Serviços')}
               <ArrowRight className="ml-2" size={18} />
             </button>
           </div>
@@ -156,19 +156,19 @@ export default function Inicio({ onNavigate }: InicioProps) {
           <div className="bg-[#2d4d70] rounded-2xl p-8 md:p-12">
             <div className="max-w-3xl mx-auto text-center">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Alumínio de Alta Qualidade
+                {get('aluminum_title', 'Alumínio de Alta Qualidade')}
               </h2>
               <p className="text-xl text-gray-300 mb-6 leading-relaxed">
-                Trabalhamos com alumínio em duas espessuras para atender suas necessidades:
+                {get('aluminum_subtitle', 'Trabalhamos com alumínio em duas espessuras para atender suas necessidades:')}
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <div className="bg-[#1e3a5f] rounded-xl p-6">
-                  <h3 className="text-2xl font-bold text-[#ff6b35] mb-2">0,5mm</h3>
-                  <p className="text-gray-300">Opção econômica com excelente durabilidade para projetos residenciais</p>
+                  <h3 className="text-2xl font-bold text-[#ff6b35] mb-2">{get('aluminum_05_title', '0,5mm')}</h3>
+                  <p className="text-gray-300">{get('aluminum_05_description', 'Opção econômica com excelente durabilidade para projetos residenciais')}</p>
                 </div>
                 <div className="bg-[#1e3a5f] rounded-xl p-6">
-                  <h3 className="text-2xl font-bold text-[#ff6b35] mb-2">0,7mm</h3>
-                  <p className="text-gray-300">Reforçada para maior resistência em projetos comerciais e industriais</p>
+                  <h3 className="text-2xl font-bold text-[#ff6b35] mb-2">{get('aluminum_07_title', '0,7mm')}</h3>
+                  <p className="text-gray-300">{get('aluminum_07_description', 'Reforçada para maior resistência em projetos comerciais e industriais')}</p>
                 </div>
               </div>
               <a
@@ -177,7 +177,7 @@ export default function Inicio({ onNavigate }: InicioProps) {
                 rel="noopener noreferrer"
                 className="inline-flex items-center bg-[#ff6b35] hover:bg-[#e55a2b] px-8 py-4 rounded-lg font-semibold transition-colors text-lg"
               >
-                Consulte a Melhor Opção para Você
+                {get('aluminum_button', 'Consulte a Melhor Opção para Você')}
                 <ArrowRight className="ml-2" size={20} />
               </a>
             </div>
@@ -188,10 +188,10 @@ export default function Inicio({ onNavigate }: InicioProps) {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-[#1e3a5f] mb-6">
-            Pronto para Começar seu Projeto?
+            {get('cta_title', 'Pronto para Começar seu Projeto?')}
           </h2>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-            Entre em contato agora e receba um orçamento personalizado sem compromisso
+            {get('cta_subtitle', 'Entre em contato agora e receba um orçamento personalizado sem compromisso')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
@@ -200,14 +200,14 @@ export default function Inicio({ onNavigate }: InicioProps) {
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center bg-[#ff6b35] hover:bg-[#e55a2b] text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg"
             >
-              WhatsApp: (47) 98910-0709
+              {get('cta_whatsapp', 'WhatsApp: (47) 98910-0709')}
               <ArrowRight className="ml-2" size={20} />
             </a>
             <button
               onClick={() => onNavigate('contato')}
               className="inline-flex items-center justify-center bg-[#1e3a5f] hover:bg-[#2d4d70] text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg"
             >
-              Formulário de Contato
+              {get('cta_contact', 'Formulário de Contato')}
               <ChevronRight className="ml-2" size={20} />
             </button>
           </div>
