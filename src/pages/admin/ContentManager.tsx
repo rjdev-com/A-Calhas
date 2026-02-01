@@ -376,15 +376,16 @@ export default function ContentManager() {
     try {
       const { data, error } = await supabase
         .from('page_content')
-        .select('section_key, content')
-        .eq('page_name', selectedPage.id);
+        .select('section_key, content_value')
+        .eq('page_name', selectedPage.id)
+        .order('order_index', { ascending: true });
 
       if (error) throw error;
 
       const contentMap: ContentData = {};
       (data || []).forEach((item) => {
         if (item.section_key) {
-          contentMap[item.section_key] = item.content || '';
+          contentMap[item.section_key] = item.content_value || '';
         }
       });
 
@@ -421,8 +422,7 @@ export default function ContentManager() {
         const { error } = await supabase
           .from('page_content')
           .update({
-            content: value,
-            content_type: field.type === 'image' ? 'image' : 'text',
+            content_value: value,
           })
           .eq('id', existing.id);
 
@@ -431,8 +431,8 @@ export default function ContentManager() {
         const { error } = await supabase.from('page_content').insert({
           page_name: selectedPage.id,
           section_key: key,
-          content: value,
-          content_type: field.type === 'image' ? 'image' : 'text',
+          content_value: value,
+          order_index: 0,
         });
 
         if (error) throw error;
@@ -471,16 +471,15 @@ export default function ContentManager() {
           await supabase
             .from('page_content')
             .update({
-              content: value,
-              content_type: field.type === 'image' ? 'image' : 'text',
+              content_value: value,
             })
             .eq('id', existing.id);
         } else {
           await supabase.from('page_content').insert({
             page_name: selectedPage.id,
             section_key: field.key,
-            content: value,
-            content_type: field.type === 'image' ? 'image' : 'text',
+            content_value: value,
+            order_index: 0,
           });
         }
       }
