@@ -28,25 +28,25 @@ interface PageConfig {
 const pagesConfig: PageConfig[] = [
   {
     id: 'inicio',
-    name: 'Pagina Inicial',
+    name: 'Página Inicial',
     icon: '🏠',
     sections: [
       {
         id: 'geral',
-        title: 'Configuracoes Gerais (WhatsApp)',
+        title: 'Configurações Gerais (WhatsApp)',
         fields: [
-          { key: 'whatsapp_numero', label: 'Numero do WhatsApp (apenas numeros)', type: 'text', placeholder: 'Ex: 5547989100709', defaultValue: '5547989100709' },
-          { key: 'whatsapp_mensagem', label: 'Mensagem padrao do WhatsApp', type: 'text', placeholder: 'Mensagem que aparece ao clicar', defaultValue: 'Ola, gostaria de solicitar um orcamento' },
+          { key: 'whatsapp_numero', label: 'Número do WhatsApp (apenas números)', type: 'text', placeholder: 'Ex: 5547989100709', defaultValue: '5547989100709' },
+          { key: 'whatsapp_mensagem', label: 'Mensagem padrão do WhatsApp', type: 'text', placeholder: 'Mensagem que aparece ao clicar', defaultValue: 'Olá, gostaria de solicitar um orçamento' },
         ],
       },
       {
         id: 'hero',
-        title: 'Secao Principal (Hero)',
+        title: 'Seção Principal (Hero)',
         fields: [
-          { key: 'hero_title', label: 'Titulo Principal', type: 'text', placeholder: 'Ex: Calhas de Aluminio de Alta Qualidade em', defaultValue: 'Calhas de Aluminio de Alta Qualidade em' },
-          { key: 'hero_subtitle', label: 'Subtitulo', type: 'textarea', placeholder: 'Descricao do servico', defaultValue: 'Fabricacao e instalacao profissional de calhas, rufos e produtos em aluminio 0,5mm e 0,7mm' },
-          { key: 'hero_button1', label: 'Botao Principal (CTA)', type: 'text', placeholder: 'Texto do botao', defaultValue: 'Solicitar Orcamento Gratis' },
-          { key: 'hero_button2', label: 'Botao Secundario', type: 'text', placeholder: 'Texto do botao', defaultValue: 'Quer Trabalhos Como Esses?' },
+          { key: 'hero_title', label: 'Título Principal', type: 'text', placeholder: 'Ex: Calhas de Alumínio de Alta Qualidade em', defaultValue: 'Calhas de Alumínio de Alta Qualidade em' },
+          { key: 'hero_subtitle', label: 'Subtítulo', type: 'textarea', placeholder: 'Descrição do serviço', defaultValue: 'Fabricação e instalação profissional de calhas, rufos e produtos em alumínio 0,5mm e 0,7mm' },
+          { key: 'hero_button1', label: 'Botão Principal (CTA)', type: 'text', placeholder: 'Texto do botão', defaultValue: 'Solicitar Orçamento Grátis' },
+          { key: 'hero_button2', label: 'Botão Secundário', type: 'text', placeholder: 'Texto do botão', defaultValue: 'Quer Trabalhos Como Esses?' },
         ],
       },
       {
