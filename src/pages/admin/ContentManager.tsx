@@ -411,30 +411,40 @@ export default function ContentManager() {
     try {
       const value = content[key] ?? field.defaultValue;
 
-      const { data: existing } = await supabase
+      // Verificar sessao do usuario
+      const { data: sessionData } = await supabase.auth.getSession();
+      console.log('[v0] Sessao atual:', sessionData?.session ? 'Autenticado' : 'NAO autenticado');
+      console.log('[v0] Salvando:', { page: selectedPage.id, key, value: value?.substring(0, 50) });
+
+      const { data: existing, error: selectError } = await supabase
         .from('page_content')
         .select('id')
         .eq('page_name', selectedPage.id)
         .eq('section_key', key)
         .single();
 
+      console.log('[v0] Registro existente:', existing, 'Erro select:', selectError?.message);
+
       if (existing) {
-        const { error } = await supabase
+        const { error, data: updateData } = await supabase
           .from('page_content')
           .update({
             content_value: value,
           })
-          .eq('id', existing.id);
+          .eq('id', existing.id)
+          .select();
 
+        console.log('[v0] Update resultado:', updateData, 'Erro update:', error?.message);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from('page_content').insert({
+        const { error, data: insertData } = await supabase.from('page_content').insert({
           page_name: selectedPage.id,
           section_key: key,
           content_value: value,
           order_index: 0,
-        });
+        }).select();
 
+        console.log('[v0] Insert resultado:', insertData, 'Erro insert:', error?.message);
         if (error) throw error;
       }
 
@@ -446,9 +456,9 @@ export default function ContentManager() {
           return next;
         });
       }, 2000);
-    } catch (error) {
-      console.error('Erro ao salvar:', error);
-      alert('Erro ao salvar conteúdo');
+    } catch (error: any) {
+      console.error('[v0] Erro ao salvar:', error?.message, error?.details, error?.hint);
+      alert('Erro ao salvar conteúdo: ' + (error?.message || 'Erro desconhecido'));
     } finally {
       setSaving(false);
     }
