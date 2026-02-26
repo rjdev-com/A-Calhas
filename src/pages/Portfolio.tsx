@@ -216,7 +216,7 @@ export default function Portfolio() {
             {get('cta_subtitle', 'Entre em contato e transforme seu projeto em realidade com qualidade e profissionalismo.')}
           </p>
           <a
-            href="https://wa.me/5547989100709?text=Olá,%20vi%20o%20portfólio%20e%20gostaria%20de%20um%20orçamento"
+            href={`https://wa.me/${get('whatsapp_numero', '5547989100709')}?text=${encodeURIComponent('Olá, vi o portfólio e gostaria de um orçamento')}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center bg-[#ff6b35] hover:bg-[#e55a2b] text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg"

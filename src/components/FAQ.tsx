@@ -1,8 +1,13 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { usePageContent } from '../hooks/usePageContent';
 
 export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const { get } = usePageContent('inicio');
+
+  const whatsappNumero = get('whatsapp_numero', '5547989100709');
+  const whatsappLink = `https://wa.me/${whatsappNumero}?text=${encodeURIComponent('Olá, tenho algumas dúvidas sobre os serviços')}`;
 
   const faqs = [
     {
@@ -51,7 +56,7 @@ export default function FAQ() {
     <section className="py-16 bg-white">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-[#1e3a5f] mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-[#1e3a5f] mb-4 text-balance">
             Perguntas Frequentes
           </h2>
           <p className="text-xl text-gray-600">
@@ -59,7 +64,7 @@ export default function FAQ() {
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           {faqs.map((faq, index) => (
             <div
               key={index}
@@ -68,6 +73,7 @@ export default function FAQ() {
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                 className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-100 transition-colors"
+                aria-expanded={openIndex === index}
               >
                 <h3 className="text-lg font-semibold text-[#1e3a5f] pr-8">
                   {faq.question}
@@ -94,7 +100,7 @@ export default function FAQ() {
             Entre em contato conosco e teremos prazer em ajudar
           </p>
           <a
-            href="https://wa.me/5547989100709?text=Olá,%20tenho%20algumas%20dúvidas%20sobre%20os%20serviços"
+            href={whatsappLink}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center bg-[#ff6b35] hover:bg-[#e55a2b] px-8 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
