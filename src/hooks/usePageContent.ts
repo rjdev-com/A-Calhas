@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
+interface PageContentRow {
+  section_key: string;
+  content_value: string | null;
+}
+
 interface PageContent {
   [key: string]: string | null;
 }
@@ -30,16 +35,17 @@ export function usePageContent(pageName: string) {
 
         // transformar array de rows em objeto { section_key: content_value }
         const map: PageContent = {};
-        (data ?? []).forEach((row: any) => {
+        (data ?? []).forEach((row: PageContentRow) => {
           if (row.section_key) map[row.section_key] = row.content_value ?? '';
         });
 
         if (mounted) {
           setContent(map);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
         console.error('Erro ao carregar conteúdo da página', pageName, err);
-        if (mounted) setError(err?.message ?? 'Erro desconhecido');
+        if (mounted) setError(errorMessage);
       } finally {
         if (mounted) setLoading(false);
       }

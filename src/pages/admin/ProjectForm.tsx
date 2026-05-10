@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, X, Upload, Trash2, ArrowLeft, Image as ImageIcon } from 'lucide-react';
+import { Save, X, Upload, Trash2, ArrowLeft } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import type { Database } from '../../lib/database.types';
 
@@ -46,9 +46,9 @@ export default function ProjectForm({ project, onBack, onSuccess }: ProjectFormP
       setMaterialThickness(project.material_thickness || '');
       setLocation(project.location || '');
 
-      const existingImages = project.images as any;
+      const existingImages = project.images as string[] | null;
       if (Array.isArray(existingImages)) {
-        setImages(existingImages.map(url => ({ url, isExisting: true })));
+        setImages(existingImages.map((url: string) => ({ url, isExisting: true })));
       }
     }
   }, [project]);

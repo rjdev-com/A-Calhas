@@ -266,7 +266,7 @@ export default function QuoteForm() {
                     <label className="block text-sm font-semibold text-gray-700 mb-1">Dificuldade</label>
                     <select
                       value={item.difficulty_level}
-                      onChange={(e) => updateItem(index, { difficulty_level: e.target.value as any })}
+                      onChange={(e) => updateItem(index, { difficulty_level: e.target.value as 'normal' | 'medium' | 'hard' })}
                       className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                     >
                       <option value="normal">Normal ({serviceTypes.find(s => s.id === item.service_type_id)?.difficulty_factor_normal}x)</option>

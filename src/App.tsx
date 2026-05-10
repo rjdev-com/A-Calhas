@@ -18,6 +18,13 @@ function App() {
     return window.location.pathname === '/admin' ? 'admin' : 'inicio';
   });
 
+  const handleNavigate = (page: string) => {
+    const validPages: Page[] = ['inicio', 'servicos', 'portfolio', 'sobre', 'contato', 'admin'];
+    if (validPages.includes(page as Page)) {
+      setCurrentPage(page as Page);
+    }
+  };
+
   useEffect(() => {
     if (currentPage !== 'admin') {
       updateMetaTags(currentPage);
@@ -88,7 +95,7 @@ function App() {
       case 'inicio':
         return (
           <>
-            <Inicio onNavigate={setCurrentPage} />
+            <Inicio onNavigate={handleNavigate} />
             <FAQ />
           </>
         );
@@ -103,7 +110,7 @@ function App() {
       case 'admin':
         return <AdminMain />;
       default:
-        return <Inicio onNavigate={setCurrentPage} />;
+        return <Inicio onNavigate={handleNavigate} />;
     }
   };
 
@@ -117,7 +124,7 @@ function App() {
 
   return (
     <>
-      <Layout currentPage={currentPage} onNavigate={setCurrentPage}>
+      <Layout currentPage={currentPage} onNavigate={handleNavigate}>
         {renderPage()}
       </Layout>
       <WhatsAppButton />

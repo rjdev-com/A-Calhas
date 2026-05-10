@@ -8,13 +8,21 @@ interface Customer {
   status: string;
   full_name?: string;
   cpf?: string;
+  rg?: string;
   company_name?: string;
   trade_name?: string;
   cnpj?: string;
+  ie?: string;
+  im?: string;
+  responsible_name?: string;
+  responsible_position?: string;
   phone: string;
   whatsapp?: string;
   email?: string;
   address?: string;
+  internal_notes?: string;
+  contact_preferences?: string;
+  commercial_conditions?: string;
   created_at: string;
 }
 
@@ -247,21 +255,21 @@ function CustomerForm({ customer, onBack, onSuccess }: CustomerFormProps) {
     status: customer?.status || 'pre_lista',
     full_name: customer?.full_name || '',
     cpf: customer?.cpf || '',
-    rg: customer?.['rg'] || '',
+    rg: customer?.rg || '',
     company_name: customer?.company_name || '',
     trade_name: customer?.trade_name || '',
     cnpj: customer?.cnpj || '',
-    ie: customer?.['ie'] || '',
-    im: customer?.['im'] || '',
-    responsible_name: customer?.['responsible_name'] || '',
-    responsible_position: customer?.['responsible_position'] || '',
+    ie: customer?.ie || '',
+    im: customer?.im || '',
+    responsible_name: customer?.responsible_name || '',
+    responsible_position: customer?.responsible_position || '',
     address: customer?.address || '',
     phone: customer?.phone || '',
     whatsapp: customer?.whatsapp || '',
     email: customer?.email || '',
-    internal_notes: customer?.['internal_notes'] || '',
-    contact_preferences: customer?.['contact_preferences'] || '',
-    commercial_conditions: customer?.['commercial_conditions'] || '',
+    internal_notes: customer?.internal_notes || '',
+    contact_preferences: customer?.contact_preferences || '',
+    commercial_conditions: customer?.commercial_conditions || '',
   });
 
   const [saving, setSaving] = useState(false);

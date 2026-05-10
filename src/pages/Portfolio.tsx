@@ -7,7 +7,7 @@ import { usePageContent } from '../hooks/usePageContent';
 type Project = Database['public']['Tables']['projects']['Row'];
 
 export default function Portfolio() {
-  const { get, loading: contentLoading } = usePageContent('portfolio');
+  const { get } = usePageContent('portfolio');
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('todos');
@@ -49,7 +49,7 @@ export default function Portfolio() {
 
   const getProjectImages = (project: Project): string[] => {
     if (!project.images) return [];
-    const images = project.images as any;
+    const images = project.images as string[] | null;
     if (Array.isArray(images)) return images;
     return [];
   };

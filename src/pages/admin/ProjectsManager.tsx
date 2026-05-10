@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus, Search, Edit2, Trash2, Image as ImageIcon, MapPin, Layers, X } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Image as ImageIcon, MapPin, Layers } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import type { Database } from '../../lib/database.types';
 
@@ -34,7 +34,20 @@ export default function ProjectsManager({ onNewProject, onEditProject }: Project
   }, []);
 
   useEffect(() => {
-    filterProjects();
+    let filtered = projects;
+
+    if (selectedCategory !== 'todos') {
+      filtered = filtered.filter(p => p.category === selectedCategory);
+    }
+
+    if (searchTerm) {
+      filtered = filtered.filter(p =>
+        p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.location?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    setFilteredProjects(filtered);
   }, [projects, searchTerm, selectedCategory]);
 
   const loadProjects = async () => {
@@ -53,32 +66,15 @@ export default function ProjectsManager({ onNewProject, onEditProject }: Project
     }
   };
 
-  const filterProjects = () => {
-    let filtered = projects;
-
-    if (selectedCategory !== 'todos') {
-      filtered = filtered.filter(p => p.category === selectedCategory);
-    }
-
-    if (searchTerm) {
-      filtered = filtered.filter(p =>
-        p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.location?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    setFilteredProjects(filtered);
-  };
-
   const handleDelete = async (projectId: string) => {
     setDeleting(true);
     try {
       const project = projects.find(p => p.id === projectId);
       if (!project) return;
 
-      const images = project.images as any;
+      const images = project.images as string[] | null;
       if (Array.isArray(images) && images.length > 0) {
-        const imagePaths = images.map(url => {
+        const imagePaths = images.map((url: string) => {
           const urlObj = new URL(url);
           const pathParts = urlObj.pathname.split('/');
           return pathParts.slice(pathParts.indexOf('project-images') + 1).join('/');
@@ -108,7 +104,7 @@ export default function ProjectsManager({ onNewProject, onEditProject }: Project
 
   const getProjectImages = (project: Project): string[] => {
     if (!project.images) return [];
-    const images = project.images as any;
+    const images = project.images as string[] | null;
     if (Array.isArray(images)) return images;
     return [];
   };

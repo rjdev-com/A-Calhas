@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Save, Image, Type, Code, Plus, Trash2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
@@ -28,11 +28,7 @@ export default function ContentManager() {
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadPageContent();
-  }, [selectedPage]);
-
-  const loadPageContent = async () => {
+  const loadPageContent = useCallback(async () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -49,7 +45,11 @@ export default function ContentManager() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedPage]);
+
+  useEffect(() => {
+    loadPageContent();
+  }, [loadPageContent]);
 
   const handleSave = async (content: PageContent) => {
     setSaving(true);
